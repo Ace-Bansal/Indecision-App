@@ -10,20 +10,27 @@ class IndecisionApp extends React.Component {
             chosenOption: ""
         }
     }
+    componentDidMount() {
+        const stringJSON = localStorage.getItem("options");
+        const options = JSON.parse(stringJSON);
+        if (options) {
+            this.setState(() => ({ options }));
+        }
+    }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.options.length !== this.state.options.length) {
+            const json = JSON.stringify(this.state.options);
+            localStorage.setItem("options", json);
+            console.log("updated")
+        }
+    }
+
     handleRemoveAll() {
-        this.setState(() => {
-            return {
-                options: []
-            }
-        })
+        this.setState(() => ({ options: [] }))
     }
     selectOption() {
         let x = Math.floor((Math.random() * this.state.options.length));
-        this.setState(() => {
-            return {
-                chosenOption: this.state.options[x]
-            }
-        })
+        this.setState(() => ({ chosenOption: this.state.options[x] }))
     }
     handleFormSubmit(newOption) {
         if (newOption.length == 0) {
@@ -33,18 +40,18 @@ class IndecisionApp extends React.Component {
                 return 'This option already exists'
             }
         }
-        this.setState((prevState) => {
-            return {
-                options: prevState.options.concat(newOption)
-            }
-        })
+        this.setState((prevState) => ({ options: prevState.options.concat(newOption) }))
     }
     handleRemoveSingle(option) {
         this.setState((prevState) => {
-            const x = prevState.options.indexOf(option);
-            prevState.options.splice(x, 1);
             return {
-                options: prevState.options
+                options: prevState.options.filter((x) => {
+                    if (x != option) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
             }
         })
     }
@@ -95,6 +102,7 @@ class Option extends React.Component {
     handleRemoveSingle() {
         this.props.handleRemoveSingle(this.props.option)
     }
+
     render() {
         return (
             <div>
@@ -107,18 +115,19 @@ class Option extends React.Component {
 
 
 class Options extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleRemoveSingle = this.handleRemoveSingle.bind(this);
-    }
-    handleRemoveSingle(option) {
-        this.props.handleRemoveSingle(option);
-    }
+    // constructor(props) {
+    //     super(props);
+    //     this.handleRemoveSingle = this.handleRemoveSingle.bind(this);
+    // }
+    // handleRemoveSingle(option) {
+    //     this.props.handleRemoveSingle(option);
+    // }
+
     render() {
         return (
             <div>
                 {this.props.options.length > 0 ? <h3>Here are the options</h3> : <h3>No Options</h3>}
-                {this.props.options.map(x => <Option handleRemoveSingle={this.handleRemoveSingle} option={x} />)}
+                {this.props.options.map(x => <Option handleRemoveSingle={this.props.handleRemoveSingle} key={x} option={x} />)}
                 <button onClick={this.props.handleRemoveAll}>Remove All</button>
             </div>
         )
@@ -138,11 +147,7 @@ class AddOptions extends React.Component {
         e.preventDefault();
         let addedOption = e.target.elements.input.value.trim();
         let error = this.props.handleFormSubmit(addedOption);
-        this.setState(() => {
-            return {
-                error
-            }
-        })
+        this.setState(() => ({ error }));
 
 
         e.target.elements.input.value = ''
