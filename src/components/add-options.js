@@ -13,7 +13,7 @@ export default class AddOptions extends React.Component {
         let addedOption = e.target.elements.input.value.trim();
         let error = this.props.handleFormSubmit(addedOption);
         this.setState(() => ({ error }));
-
+        console.log("test")
 
         e.target.elements.input.value = ''
     }
