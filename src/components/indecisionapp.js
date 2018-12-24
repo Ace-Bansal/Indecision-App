@@ -3,12 +3,13 @@ import AddOptions from './add-options'
 import Options from './options'
 import Action from './action'
 import Header from './header'
+import OptionModal from './optionModal'
 
 
 export default class IndecisionApp extends React.Component {
     state = {
         options: [],
-        chosenOption: ""
+        chosenOption: undefined
     }
     handleRemoveAll = () => {
         this.setState(() => ({ options: [] }))
@@ -40,6 +41,9 @@ export default class IndecisionApp extends React.Component {
             }
         })
     }
+    okay = () => {
+        this.setState(() => ({chosenOption: undefined}))
+    }
     componentDidMount() {
         const stringJSON = localStorage.getItem("options");
         const options = JSON.parse(stringJSON);
@@ -62,6 +66,7 @@ export default class IndecisionApp extends React.Component {
                 <Options options={this.state.options} handleRemoveAll={this.handleRemoveAll} handleRemoveSingle={this.handleRemoveSingle} />
                 <AddOptions handleFormSubmit={this.handleFormSubmit} />
                 <Action chosenOption={this.state.chosenOption} hasOptions={this.state.options.length > 0 ? true : false} selectOption={this.selectOption} />
+                <OptionModal chosenOption={this.state.chosenOption} okay={this.okay}/>
             </div>
         )
     }
